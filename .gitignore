@@ -1,0 +1,31 @@
+# Environment files (never commit)
+.env
+backend/.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Flask
+instance/
+*.sqlite3
+
+# Uploads (runtime only)
+backend/uploads/
+uploads/
+
+# Node / frontend
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+*.swp

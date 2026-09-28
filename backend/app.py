@@ -1,7 +1,7 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
-from flask_mail import Mail
+from flask_mailman import Mail          # ← changed from flask_mail
 from config import Config
 from database import init_db, db
 import os
@@ -10,21 +10,22 @@ import os
 jwt = JWTManager()
 mail = Mail()
 
+
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
-    
+
     # Ensure upload directories exist
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     for subdir in ['lab_reports', 'patient_documents', 'prescriptions']:
         os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], subdir), exist_ok=True)
-    
+
     # Initialize extensions
     CORS(app, origins=app.config['CORS_ORIGINS'])
     jwt.init_app(app)
     mail.init_app(app)
     init_db(app)
-    
+
     # Root route
     @app.route('/')
     def index():
@@ -45,7 +46,7 @@ def create_app(config_class=Config):
             },
             'status': 'running'
         }), 200
-    
+
     # Import blueprints
     from routes.auth import auth_bp
     from routes.patient import patient_bp
@@ -57,7 +58,7 @@ def create_app(config_class=Config):
     from routes.billing import billing_bp
     from routes.dashboard import dashboard_bp
     from routes.department import department_bp
-    
+
     # Register blueprints
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(patient_bp, url_prefix='/api/patients')
@@ -69,18 +70,19 @@ def create_app(config_class=Config):
     app.register_blueprint(billing_bp, url_prefix='/api/billing')
     app.register_blueprint(dashboard_bp, url_prefix='/api/dashboard')
     app.register_blueprint(department_bp, url_prefix='/api/departments')
-    
+
     # Error handlers
     @app.errorhandler(404)
     def not_found(error):
         return jsonify({'error': 'Resource not found'}), 404
-    
+
     @app.errorhandler(500)
     def internal_error(error):
         db.session.rollback()
         return jsonify({'error': 'Internal server error'}), 500
-    
+
     return app
+
 
 if __name__ == '__main__':
     app = create_app()
