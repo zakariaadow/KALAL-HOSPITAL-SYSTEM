@@ -6,9 +6,22 @@ load_dotenv()
 
 
 def _normalize_db_url(url: str) -> str:
-    """Render gives postgres:// which SQLAlchemy 1.4+ rejects."""
-    if url and url.startswith("postgres://"):
-        return url.replace("postgres://", "postgresql://", 1)
+    """
+    Normalize Postgres URLs for SQLAlchemy 2.x on Render.
+
+    - Render gives `postgres://...` (no `ql`) → SQLAlchemy rejects it.
+    - SQLAlchemy 2.x defaults `postgresql://` to the psycopg (v3) driver,
+      but we only install `psycopg2-binary`. Force `postgresql+psycopg2://`.
+    """
+    if not url:
+        return url
+
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql://", 1)
+
+    if url.startswith("postgresql://"):
+        url = url.replace("postgresql://", "postgresql+psycopg2://", 1)
+
     return url
 
 
