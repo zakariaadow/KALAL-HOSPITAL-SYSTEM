@@ -8,8 +8,13 @@ const Home = () => {
   return (
     <PublicLayout>
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-blue-700 via-blue-600 to-blue-800 text-white">
-        <div className="absolute inset-0 bg-black/10"></div>
+      <section 
+        className="relative bg-gradient-to-r from-blue-700 via-blue-600 to-blue-800 text-white bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: "url('/kalal.jpeg')" }}
+      >
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-black/50"></div>
+        
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-28">
           <div className="text-center max-w-4xl mx-auto">
             <span className="inline-block px-4 py-1 bg-white/20 rounded-full text-sm font-medium mb-6 backdrop-blur-sm">

@@ -65,9 +65,17 @@ const Laboratory = () => {
     setResultsData({ ...resultsData, [e.target.name]: e.target.value });
   };
 
+  // ✅ Format date as MySQL-friendly "YYYY-MM-DD HH:MM:SS"
+  const getMysqlDatetime = () => {
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ` +
+           `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.patient_id) {
       toast.error('Please select a patient');
       return;
@@ -103,20 +111,29 @@ const Laboratory = () => {
       results: test.results || '',
       normal_range: test.normal_range || '',
       performed_by: test.performed_by || '',
-      status: 'completed',
+      status: test.status === 'completed' ? 'completed' : 'completed',
     });
     setShowResultsModal(true);
   };
 
   const handleResultsSubmit = async (e) => {
     e.preventDefault();
-    
+
     setSubmitting(true);
     try {
-      await api.put(`/laboratory/${selectedTest.id}`, {
-        ...resultsData,
-        result_date: new Date().toISOString(),
-      });
+      const payload = {
+        results: resultsData.results,
+        normal_range: resultsData.normal_range,
+        performed_by: resultsData.performed_by,
+        status: resultsData.status,
+      };
+
+      // ✅ Send "YYYY-MM-DD HH:MM:SS" — no T, no Z
+      if (resultsData.status === 'completed') {
+        payload.result_date = getMysqlDatetime();
+      }
+
+      await api.put(`/laboratory/${selectedTest.id}`, payload);
       toast.success('Results added successfully!');
       setShowResultsModal(false);
       fetchTests();
@@ -130,7 +147,12 @@ const Laboratory = () => {
 
   const handleUpdateStatus = async (testId, status) => {
     try {
-      await api.put(`/laboratory/${testId}`, { status });
+      const payload = { status };
+      // ✅ Add MySQL-friendly result_date when completing
+      if (status === 'completed') {
+        payload.result_date = getMysqlDatetime();
+      }
+      await api.put(`/laboratory/${testId}`, payload);
       toast.success(`Test ${status}`);
       fetchTests();
     } catch (error) {
@@ -143,13 +165,13 @@ const Laboratory = () => {
     { header: 'Patient', accessor: 'patient_name' },
     { header: 'Test Name', accessor: 'test_name' },
     { header: 'Type', accessor: 'test_type' },
-    { 
-      header: 'Requested', 
+    {
+      header: 'Requested',
       accessor: 'request_date',
       render: (row) => row.request_date ? new Date(row.request_date).toLocaleString() : 'N/A'
     },
-    { 
-      header: 'Results', 
+    {
+      header: 'Results',
       accessor: 'results',
       render: (row) => row.results ? '✅ Available' : '⏳ Pending'
     },
