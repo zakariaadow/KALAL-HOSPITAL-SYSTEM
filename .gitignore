@@ -29,3 +29,9 @@ frontend/build/
 .idea/
 .DS_Store
 *.swp
+frontend/.env
+frontend/.env.local
+frontend/.env.production
+frontend/.env.development
+frontend/public/.env
+*.env.local
