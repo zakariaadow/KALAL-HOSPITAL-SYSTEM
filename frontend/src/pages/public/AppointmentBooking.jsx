@@ -14,7 +14,7 @@ const AppointmentBooking = () => {
 
   const fetchDoctors = async () => {
     try {
-      const response = await axios.get('/api/doctors/');
+      const response = await axios.get(`${import.meta.env.VITE_API_URL || '/api'}/doctors/`);
       setDoctors(response.data.filter(d => d.is_available));
     } catch (error) {
       console.error('Failed to fetch doctors:', error);

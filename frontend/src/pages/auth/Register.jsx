@@ -97,7 +97,7 @@ const Register = () => {
     console.log('Sending registration data:', userData);
     
     try {
-      const response = await fetch('/api/auth/register-request', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/auth/register-request`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

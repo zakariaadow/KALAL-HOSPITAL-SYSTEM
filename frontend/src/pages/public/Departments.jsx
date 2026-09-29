@@ -14,7 +14,7 @@ const Departments = () => {
 
   const fetchDepartments = async () => {
     try {
-      const response = await axios.get('/api/departments/');
+      const response = await axios.get(`${import.meta.env.VITE_API_URL || '/api'}/departments/`);
       setDepartments(response.data);
       setError(null);
     } catch (err) {
